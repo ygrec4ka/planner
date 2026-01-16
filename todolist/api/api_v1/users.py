@@ -1,0 +1,33 @@
+from typing import TYPE_CHECKING
+
+from fastapi import APIRouter
+
+from core.authentication.fastapi_users import fastapi_users
+from core.config import settings
+from core.schemas.user import (
+    UserRead,
+    UserUpdate,
+)
+
+
+router = APIRouter(
+    prefix=settings.api.v1.users,
+    tags=["Users"],
+)
+
+
+# /me
+# /{id}
+router.include_router(
+    router=fastapi_users.get_users_router(
+        UserRead,
+        UserUpdate,
+    ),
+)
+
+
+# /forgot-password
+# /reset-password
+router.include_router(
+    router=fastapi_users.get_reset_password_router(),
+)

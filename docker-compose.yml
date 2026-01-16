@@ -1,0 +1,53 @@
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    environment:
+      - APP_CONFIG__DB__URL=postgresql+asyncpg://postgres:postgres@pg:5432/todo
+    ports:
+      - "5050:8000"
+    depends_on:
+      pg:
+        condition: service_healthy
+    develop:
+      watch:
+       - action: sync+restart
+         path: ./todolist
+         target: /app
+
+  pg:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: todo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d todo"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "8000:80"
+
+  smtp:
+    image: maildev/maildev
+    container_name: todo_smtp
+    ports:
+      - "1025:1025"
+      - "1080:1080"
+
+volumes:
+  pgdata:
