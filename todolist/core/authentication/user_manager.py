@@ -9,6 +9,7 @@ from core.config import settings
 from core.types.user_id import UserIdType
 from mailing.send_email_confirmed import send_email_confirmed
 from mailing.send_verification_email import send_verification_email
+from utils.webhooks.user import send_new_user_notification
 
 if TYPE_CHECKING:
     from fastapi import Request, BackgroundTasks
@@ -44,6 +45,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, UserIdType]):
             "User %r has registered.",
             user.id,
         )
+        await send_new_user_notification(user)
 
     async def on_after_forgot_password(
         self,
