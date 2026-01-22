@@ -68,7 +68,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, UserIdType]):
             token,
         )
 
-        verification_link = request.url_for("verify_email").replace_query_params(
+        verification_link = request.url_for("verify:verify").replace_query_params(
             token=token
         )
 
