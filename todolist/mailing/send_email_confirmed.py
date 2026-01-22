@@ -26,6 +26,7 @@ async def send_email_confirmed(
     context = {
         "user": user,
     }
+
     html_content = template.render(
         context=context,
     )
