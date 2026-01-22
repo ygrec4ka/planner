@@ -1,8 +1,8 @@
-"""create access tokens table
+"""create usersand access_token tables
 
-Revision ID: e250c667de65
-Revises: 5129927524cf
-Create Date: 2026-01-15 14:38:14.101995
+Revision ID: 6bab4f9ca8b3
+Revises:
+Create Date: 2026-01-22 20:46:15.539179
 
 """
 
@@ -14,17 +14,29 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "e250c667de65"
-down_revision: Union[str, Sequence[str], None] = "5129927524cf"
+revision: str = "6bab4f9ca8b3"
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+
+    op.create_table(
+        "users",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("email", sa.String(length=320), nullable=False),
+        sa.Column("hashed_password", sa.String(length=1024), nullable=False),
+        sa.Column("is_active", sa.Boolean(), nullable=False),
+        sa.Column("is_superuser", sa.Boolean(), nullable=False),
+        sa.Column("is_verified", sa.Boolean(), nullable=False),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_users")),
+    )
+    op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
     op.create_table(
         "access_tokens",
-        sa.Column("token", sa.String(length=43), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column("token", sa.String(length=43), nullable=False),
         sa.Column(
             "created_at",
             fastapi_users_db_sqlalchemy.generics.TIMESTAMPAware(timezone=True),
@@ -47,8 +59,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_index(
-        op.f("ix_access_tokens_created_at"),
-        table_name="access_tokens",
-    )
+    op.drop_index(op.f("ix_access_tokens_created_at"), table_name="access_tokens")
     op.drop_table("access_tokens")
+    op.drop_index(op.f("ix_users_email"), table_name="users")
+    op.drop_table("users")
