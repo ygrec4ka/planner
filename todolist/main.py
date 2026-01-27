@@ -4,6 +4,8 @@ from fastapi import FastAPI
 
 from api import router as api_router
 from core.config import settings
+from api.webhooks import webhooks_router
+
 
 logging.basicConfig(
     level=settings.logging.log_level_value,
@@ -11,7 +13,9 @@ logging.basicConfig(
 )
 
 
-app = FastAPI()
+app = FastAPI(
+    webhooks=webhooks_router,
+)
 
 app.include_router(
     api_router,
