@@ -3,8 +3,8 @@ from .base import Base
 from .users import User
 from .access_token import AccessToken
 from .tasks import Task
+from .notes import Note
 
-# from .notes import Note
 # from .comments import Comment
 
 __all__ = (
@@ -12,7 +12,7 @@ __all__ = (
     "Base",
     "User",
     "Task",
-    #    "Note",
+    "Note",
     #    "Comment",
     "AccessToken",
 )
