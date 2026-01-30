@@ -12,15 +12,12 @@ class PriorityEnum(str, Enum):
     DONT_DO = "dont_do"  # Не срочные не важные
 
 
-class TaskRead(BaseModel):
-    id: int
+class TaskBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    content: Optional[str] = Field(None, max_length=255)
+    content: Optional[str] = None  # Text поле, без ограничения в схеме
 
 
-class TaskCreate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=255)
-    content: Optional[str] = Field(None, max_length=255)
+class TaskCreate(TaskBase):
     priority: PriorityEnum = PriorityEnum.SCHEDULE
 
 
@@ -30,8 +27,12 @@ class TaskUpdate(BaseModel):
     priority: Optional[PriorityEnum] = None
 
 
-class TaskResponse(TaskRead):
+class TaskRead(TaskBase):
+    id: int
     priority: PriorityEnum
+
+
+class TaskResponse(TaskRead):
     user_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
