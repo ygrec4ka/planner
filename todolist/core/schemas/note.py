@@ -4,20 +4,22 @@ from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
 
 
-class NoteRead(BaseModel):
-    id: int
+class NoteBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    content: Optional[str] = Field(None, max_length=255)
+    content: Optional[str] = None
 
 
-class NoteCreate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=255)
-    content: Optional[str] = Field(None, max_length=255)
+class NoteCreate(NoteBase):
+    pass
 
 
 class NoteUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=255)
     content: Optional[str] = None
+
+
+class NoteRead(NoteBase):
+    id: int
 
 
 class NoteResponse(NoteRead):
