@@ -4,8 +4,7 @@ from .users import User
 from .access_token import AccessToken
 from .tasks import Task
 from .notes import Note
-
-# from .comments import Comment
+from .comments import Comment
 
 __all__ = (
     "db_helper",
@@ -13,6 +12,6 @@ __all__ = (
     "User",
     "Task",
     "Note",
-    #    "Comment",
+    "Comment",
     "AccessToken",
 )

@@ -13,6 +13,7 @@ from .mixins.id_int_pk import IdIntPkMixin
 if TYPE_CHECKING:
     from core.models import Note
     from core.models import Task
+    from core.models import Comment
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -25,6 +26,11 @@ class User(Base, IdIntPkMixin, SQLAlchemyBaseUserTable[UserIdType]):
     )
 
     tasks: Mapped[List["Task"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    comments: Mapped[List["Comment"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
