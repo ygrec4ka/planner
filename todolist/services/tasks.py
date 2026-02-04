@@ -16,7 +16,10 @@ class TaskService:
         task_data: TaskCreate,
         user: User,
     ) -> Task:
-        new_task = Task(**task_data.model_dump(), user_id=user.id)
+        new_task = Task(
+            **task_data.model_dump(),
+            user_id=user.id,
+        )
 
         self.session.add(new_task)
         await self.session.commit()

@@ -15,7 +15,10 @@ class NoteService:
         note_data: NoteCreate,
         user: User,
     ) -> Note:
-        new_note = Note(**note_data.model_dump(), user_id=user.id)
+        new_note = Note(
+            **note_data.model_dump(),
+            user_id=user.id,
+        )
 
         self.session.add(new_note)
         await self.session.commit()
