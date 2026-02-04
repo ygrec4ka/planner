@@ -1,28 +1,49 @@
-# from typing import Optional
-# from datetime import datetime
-# from pydantic import BaseModel, Field, ConfigDict
-#
-#
-# class BaseComment(BaseModel):
-#     model_config = ConfigDict(from_attributes=True)
-#
-#     content: str
-#
-#
-# class CommentCreate(BaseModel):
-#     content: str = Field(..., min_length=1)
-#     task_id: Optional[int] = None
-#     note_id: Optional[int] = None
-#
-#
-# class CommentUpdate(BaseModel):
-#     content: Optional[str] = Field(None, min_length=1)
-#
-#
-# class CommentResponse(BaseModel):
-#     model_config = ConfigDict(from_attributes=True)
-#
-#     id: int
-#     content: str
-#     created_at: datetime
-#     updated_at: datetime
+from datetime import datetime
+from typing import Optional, Annotated
+
+from pydantic import BaseModel, ConfigDict, Field
+from enum import Enum
+
+
+class CommentableType(str, Enum):
+    TASK = "task"
+    NOTE = "note"
+
+
+class CommentBase(BaseModel):
+    content: str = Field(
+        ...,
+        min_length=1,
+        max_length=3000,
+    )
+
+
+class CommentCreate(CommentBase):
+    commentable_type: CommentableType = Field(
+        ...,
+    )  # Тип объекта, к которому добавляется комментарий
+    commentable_id: int = Field(
+        ...,
+    )  # ID объекта, к которому добавляется комментарий
+
+
+class CommentUpdate(BaseModel):
+    content: Optional[str] = Field(
+        None,
+        min_length=1,
+        max_length=3000,
+    )
+
+
+class CommentRead(BaseModel):
+    id: int
+    commentable_type: str
+    commentable_id: int
+
+
+class CommentResponse(CommentRead):
+    user_id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
