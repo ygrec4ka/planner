@@ -54,3 +54,16 @@ async def get_all_notes(
     )
 
 
+@router.patch("/{note_id}", response_model=NoteResponse)
+async def update_note(
+    note_data: NoteUpdate,
+    note: Note = Depends(note_getter),
+    service: NoteService = Depends(NoteService),
+):
+    return await service.update_note(
+        note=note,
+        note_data=note_data,
+    )
+
+
+@router.delete("/{note_id}")
