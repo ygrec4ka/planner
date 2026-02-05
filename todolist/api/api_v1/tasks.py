@@ -96,3 +96,34 @@
 #     )
 #
 #     return {"message": "Task deleted successfully"}
+
+from api.dependencies.task.task import task_getter
+from core.authentication.fastapi_users import current_user
+from core.config import settings
+
+from core.models import User, Task
+
+from core.schemas.comment import CommentResponse, CommentCreate
+from core.schemas.task import TaskResponse, TaskCreate, TaskUpdate
+
+from services.comments import CommentService
+from services.tasks import TaskService
+
+router = APIRouter(
+    prefix=settings.api.v1.tasks,
+    tags=["Tasks"],
+)
+
+
+@router.post("/", response_model=TaskResponse)
+async def create_task(
+    task_data: TaskCreate,
+    service: TaskService = Depends(TaskService),
+    user: User = Depends(current_user),
+):
+    return await service.create_task(
+        task_data=task_data,
+        user=user,
+    )
+
+
