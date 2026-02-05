@@ -44,3 +44,13 @@ async def get_note(
     )
 
 
+@router.get("/", response_model=List[NoteResponse])
+async def get_all_notes(
+    service: NoteService = Depends(NoteService),
+    user: User = Depends(current_user),
+):
+    return await service.get_notes(
+        user=user,
+    )
+
+
