@@ -127,3 +127,15 @@ async def create_task(
     )
 
 
+@router.get("/{task_id}", response_model=TaskResponse)
+async def get_task(
+    task_id: int,
+    service: TaskService = Depends(TaskService),
+    user: User = Depends(current_user),
+):
+    return await service.get_task_by_id(
+        task_id=task_id,
+        user=user,
+    )
+
+
