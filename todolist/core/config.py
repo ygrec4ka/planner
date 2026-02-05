@@ -58,6 +58,9 @@ class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
     auth: str = "/auth"
     users: str = "/users"
+    comments: str = "/comments"
+    tasks: str = "/tasks"
+    notes: str = "/notes"
     messages: str = "/messages"
     service: str = "/service"
 
