@@ -53,10 +53,8 @@ class NoteService:
         note: Note,
         note_data: NoteUpdate,
     ) -> Note:
-        update_data = note_data.model_dump(exclude_unset=True)
-
-        for key, value in update_data.items():
-            setattr(note, key, value)
+        for key, value in note_data.model_dump(exclude_unset=True).items():
+            setattr(note_data, key, value)
 
         await self.session.commit()
         await self.session.refresh(note)
