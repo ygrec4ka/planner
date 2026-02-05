@@ -12,7 +12,6 @@ class CommentService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def _get_commentable_object(
     async def create_task_comment(
         self,
         comment_data: CommentCreate,
@@ -45,37 +44,39 @@ class CommentService:
 
         return new_comment_for_task
 
+    async def create_note_comment(
         self,
-        commentable_id: int,
-        commentable_type: CommentableType,
-    ) -> Optional[Task | Note]:
-        if commentable_type == CommentableType.TASK:
-            stmt = select(Task).where(Task.id == commentable_id)
-        elif commentable_type == CommentableType.NOTE:
-            stmt = select(Note).where(Note.id == commentable_id)
-        else:
+        comment_data: CommentCreate,
+        user: User,
+        note_id: int,
+    ) -> Comment:
+        note = await self.session.get(Note, note_id)
+        if not note:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Неизвестный тип объекта: {commentable_type}",
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Note not found",
             )
 
-        result: Result = await self.session.execute(stmt)
-        return result.scalar_one_or_none()
+        if note.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have access to this note",
+            )
 
-    async def create_comment(self, comment_data: CommentCreate, user: User) -> Comment:
-        await self._get_commentable_object(
-            commentable_id=comment_data.commentable_id,
-            commentable_type=comment_data.commentable_type,
-        )
-
-        new_comment = Comment(
+        new_comment_for_note = Comment(
             **comment_data.model_dump(),
             user_id=user.id,
+            commentable_type=CommentableType.NOTE,
+            commentable_id=note_id,
         )
 
-        self.session.add(new_comment)
+        self.session.add(new_comment_for_note)
         await self.session.commit()
         await self.session.refresh(new_comment)
+        await self.session.refresh(new_comment_for_note)
+
+        return new_comment_for_note
+
 
         return new_comment
 
