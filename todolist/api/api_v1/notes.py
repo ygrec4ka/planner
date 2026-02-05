@@ -76,3 +76,17 @@ async def delete_note(
     )
 
 
+@router.post("/{note_id}/comments", response_model=CommentResponse)
+async def create_comment_for_note(
+    note_id: int,
+    comment_data: CommentCreate,
+    service: CommentService = Depends(CommentService),
+    user: User = Depends(current_user),
+):
+    await service.create_note_comment(
+        comment_data=comment_data,
+        user=user,
+        note_id=note_id,
+    )
+
+
