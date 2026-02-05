@@ -1,5 +1,4 @@
-from datetime import datetime
-from typing import Optional
+from typing import List
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, Result
@@ -14,6 +13,38 @@ class CommentService:
         self.session = session
 
     async def _get_commentable_object(
+    async def create_task_comment(
+        self,
+        comment_data: CommentCreate,
+        user: User,
+        task_id: int,
+    ) -> Comment:
+        task = await self.session.get(Task, task_id)
+        if not task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Task not found",
+            )
+
+        if task.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have access to this task",
+            )
+
+        new_comment_for_task = Comment(
+            **comment_data.model_dump(),
+            user_id=user.id,
+            commentable_type=CommentableType.TASK,
+            commentable_id=task_id,
+        )
+
+        self.session.add(new_comment_for_task)
+        await self.session.commit()
+        await self.session.refresh(new_comment_for_task)
+
+        return new_comment_for_task
+
         self,
         commentable_id: int,
         commentable_type: CommentableType,
