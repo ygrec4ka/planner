@@ -1,6 +1,8 @@
+from fastapi import HTTPException, status
 from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.status import HTTP_404_NOT_FOUND
 
 from core.models import User, Note
 from core.schemas.note import NoteCreate, NoteUpdate
@@ -30,14 +32,14 @@ class NoteService:
         self,
         note_id: int,
         user: User,
-    ) -> Note | None:
-        stmt = select(Note).where(
-            Note.id == note_id,
-            Note.user_id == user.id,
-        )
-        result = await self.session.execute(stmt)
-
-        return result.scalar_one_or_none()
+    ) -> Note:
+        note = await self.session.get(Note, note_id)
+        if not note or note.user_id != user.id:
+            raise HTTPException(
+                status_code=HTTP_404_NOT_FOUND,
+                detail="Note not found",
+            )
+        return note
 
     async def get_notes(
         self,
