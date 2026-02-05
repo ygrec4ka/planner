@@ -67,3 +67,12 @@ async def update_note(
 
 
 @router.delete("/{note_id}")
+async def delete_note(
+    note: Note = Depends(note_getter),
+    service: NoteService = Depends(NoteService),
+):
+    return await service.delete_note(
+        note=note,
+    )
+
+
