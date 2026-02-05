@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Annotated
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 from enum import Enum
@@ -19,12 +19,7 @@ class CommentBase(BaseModel):
 
 
 class CommentCreate(CommentBase):
-    commentable_type: CommentableType = Field(
-        ...,
-    )  # Тип объекта, к которому добавляется комментарий
-    commentable_id: int = Field(
-        ...,
-    )  # ID объекта, к которому добавляется комментарий
+    pass
 
 
 class CommentUpdate(BaseModel):
