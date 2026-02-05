@@ -54,10 +54,8 @@ class TaskService:
         task: Task,
         task_data: TaskUpdate,
     ) -> Task:
-        update_data = task_data.model_dump(exclude_unset=True)
-
-        for key, value in update_data.items():
-            setattr(task, key, value)
+        for key, value in task_data.model_dump(exclude_unset=True).items():
+            setattr(task_data, key, value)
 
         await self.session.commit()
         await self.session.refresh(task)
