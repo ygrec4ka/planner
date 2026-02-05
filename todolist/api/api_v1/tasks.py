@@ -171,3 +171,17 @@ async def delete_task(
     )
 
 
+@router.post("/{task_id}/comments", response_model=CommentResponse)
+async def create_comment_for_task(
+    task_id: int,
+    comment_data: CommentCreate,
+    service: CommentService = Depends(CommentService),
+    user: User = Depends(current_user),
+):
+    return await service.create_task_comment(
+        comment_data=comment_data,
+        user=user,
+        task_id=task_id,
+    )
+
+
