@@ -90,3 +90,13 @@ async def create_comment_for_note(
     )
 
 
+@router.get("/{note_id}/comments", response_model=List[CommentResponse])
+async def get_comments_for_note(
+    note_id: int,
+    service: CommentService = Depends(CommentService),
+    user: User = Depends(current_user),
+):
+    return await service.get_note_comments(
+        user_id=user.id,
+        note_id=note_id,
+    )
