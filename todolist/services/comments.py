@@ -72,11 +72,30 @@ class CommentService:
 
         self.session.add(new_comment_for_note)
         await self.session.commit()
-        await self.session.refresh(new_comment)
         await self.session.refresh(new_comment_for_note)
 
         return new_comment_for_note
 
+    async def get_task_comments(
+        self,
+        task_id: int,
+        user_id: int,
+    ) -> List[Comment]:
+        task = await self.session.get(Task, task_id)
+        if not task or task.user_id != user_id:
+            return []
+
+        stmt = (
+            select(Comment)
+            .where(
+                Comment.user_id == user_id,
+                Comment.commentable_type == CommentableType.TASK,
+            )
+            .order_by(Comment.created_at.asc())
+        )
+
+        result: Result = await self.session.execute(stmt)
+        return list(result.scalars().all())
 
         return new_comment
 
