@@ -149,3 +149,15 @@ async def get_all_tasks(
     )
 
 
+@router.patch("/{task_id}", response_model=TaskResponse)
+async def update_task(
+    task_data: TaskUpdate,
+    task: Task = Depends(task_getter),
+    service: TaskService = Depends(TaskService),
+):
+    return await service.update_task(
+        task=task,
+        task_data=task_data,
+    )
+
+
