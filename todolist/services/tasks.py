@@ -1,7 +1,9 @@
+from fastapi import HTTPException, status
 from typing import Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.status import HTTP_404_NOT_FOUND
 
 from core.models import User, Task
 from core.schemas.task import TaskCreate, TaskUpdate
@@ -32,13 +34,13 @@ class TaskService:
         task_id: int,
         user: User,
     ) -> Task | None:
-        stmt = select(Task).where(
-            Task.id == task_id,
-            Task.user_id == user.id,
-        )
-        result = await self.session.execute(stmt)
-
-        return result.scalar_one_or_none()
+        task = await self.session.get(Task, task_id)
+        if not task or task.user_id != user.id:
+            raise HTTPException(
+                status_code=HTTP_404_NOT_FOUND,
+                detail="Note not found",
+            )
+        return task
 
     async def get_tasks(
         self,
