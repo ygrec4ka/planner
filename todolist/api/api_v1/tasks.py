@@ -185,3 +185,13 @@ async def create_comment_for_task(
     )
 
 
+@router.get("/{task_id}/comments", response_model=List[CommentResponse])
+async def get_comments_for_task(
+    task_id: int,
+    service: CommentService = Depends(CommentService),
+    user: User = Depends(current_user),
+):
+    return await service.get_task_comments(
+        user_id=user.id,
+        task_id=task_id,
+    )
