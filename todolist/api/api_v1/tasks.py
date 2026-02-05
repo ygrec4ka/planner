@@ -161,3 +161,13 @@ async def update_task(
     )
 
 
+@router.delete("/{task_id}")
+async def delete_task(
+    task: Task = Depends(task_getter),
+    service: TaskService = Depends(TaskService),
+):
+    return await service.delete_task(
+        task=task,
+    )
+
+
