@@ -139,3 +139,13 @@ async def get_task(
     )
 
 
+@router.get("/", response_model=List[TaskResponse])
+async def get_all_tasks(
+    service: TaskService = Depends(TaskService),
+    user: User = Depends(current_user),
+):
+    return await service.get_tasks(
+        user=user,
+    )
+
+
