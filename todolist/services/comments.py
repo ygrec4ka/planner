@@ -97,16 +97,33 @@ class CommentService:
         result: Result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-        return new_comment
+    async def get_note_comments(
+        self,
+        note_id: int,
+        user_id: int,
+    ) -> List[Comment]:
+        note = await self.session.get(Note, note_id)
+        if not note or note.user_id != user_id:
+            return []
+
+        stmt = (
+            select(Comment)
+            .where(
+                Comment.user_id == user_id,
+                Comment.commentable_type == CommentableType.NOTE,
+            )
+            .order_by(Comment.created_at.asc())
+        )
+
+        result: Result = await self.session.execute(stmt)
+        return list(result.scalars().all())
 
     async def update_comment(
         self,
         comment_data: CommentUpdate,
         comment: Comment,
     ) -> Comment:
-        update_data = comment_data.model_dump(exclude_unset=True)
-
-        for key, value in update_data.items():
+        for key, value in comment_data.model_dump(exclude_unset=True).items():
             setattr(comment, key, value)
 
         await self.session.commit()
