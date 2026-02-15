@@ -25,13 +25,15 @@ async def send_verification_email(
         """
     )
 
-    template = templates.get_template("mailing/email-verify/verification_email.html")
+    template = templates.get_template(
+        "mailing/email-verify/verification-request.html",
+    )
     context = {
         "user": user,
         "verification_link": verification_link,
     }
     html_content = template.render(
-        context=context,
+        **context,
     )
 
     await send_email(
