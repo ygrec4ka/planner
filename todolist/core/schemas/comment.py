@@ -32,6 +32,7 @@ class CommentUpdate(BaseModel):
 
 class CommentRead(BaseModel):
     id: int
+    content: str
     commentable_type: str
     commentable_id: int
 
